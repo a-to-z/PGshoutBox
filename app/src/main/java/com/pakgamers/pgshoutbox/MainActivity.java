@@ -1,77 +1,99 @@
 package com.pakgamers.pgshoutbox;
-
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
     //URL address
     String url = "http://www.pakgamers.com/forums/vbshout.php?do=detach&instanceid=1";
-    ProgressDialog mProgressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new Description().execute();
-    }
 
-    // Description AsyncTask
-    private class Description extends AsyncTask<Void, Void, Void> {
-        String desc;
+        final WebView webView = (WebView) findViewById(R.id.webView);
+        final TextView textView = (TextView) findViewById(R.id.textView);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressDialog = new ProgressDialog(MainActivity.this);
-            mProgressDialog.setTitle("Loading ShoutBox");
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.show();
-        }
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setUserAgentString("Chrome/42.0.2311.135");
+        webView.setVisibility(View.INVISIBLE);
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                // Connect to the web site
-                Document document = Jsoup.connect(url).userAgent("Chrome/41.0.2272.118").get();
-                // Using Elements to get the Meta data
-                Elements description = document.select("script[name=dbtech_vbshout_shouttype_shout]");
-                // Locate the content attribute
-                for (Element e : description) {
-                    desc = e.attr("name");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        final WebAppInterface jInterface = new WebAppInterface(this);
+        webView.addJavascriptInterface(jInterface, "HtmlViewer");
+
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                //load html
+                webView.loadUrl("javascript:window.HtmlViewer.showHTML('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>');");
             }
-            return null;
-        }
+        });
 
-        @Override
-        protected void onPostExecute(Void result) {
-            // Set description into TextView
-            TextView txtdesc = (TextView) findViewById(R.id.txtView);
-            txtdesc.setText(desc);
-            mProgressDialog.dismiss();
-        }
+        webView.loadUrl(url);
+        Document doc = Jsoup.parse(jInterface.html);
+        Elements msg = doc.select("span[name=dbtech_vbshoutbox_shout]");
+
+
+        textView.setText("wait for it");
+
+        CountDownTimer countDownTimer = new CountDownTimer(10000, 1000) {
+            public void onFinish() {
+                // When timer is finished
+                // Execute your code here
+
+                String lel = "";
+                Document doc = Jsoup.parse(jInterface.html);
+                Elements msg = doc.select("span[name=dbtech_vbshout_shout]");
+                Elements lol = msg.select("span[style]");
+                for (Element e : lol) {
+                    lel += e.ownText() + "\n";
+                }
+                textView.setText(lel);
+            }
+
+            public void onTick(long millisUntilFinished) {
+                // millisUntilFinished    The amount of time until finished.
+            }
+        }.start();
+
+        /*AlertDialog.Builder rekt = new AlertDialog.Builder(this);
+        rekt.setMessage("get rekt");
+        rekt.setTitle("SENPAI");
+        rekt.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dismiss
+                    }
+                });
+        rekt.setCancelable(true);
+        rekt.create().show();*/
+        //Toast.makeText(context, doc.title(), Toast.LENGTH_LONG);
+
     }
 
-
-    @Override
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
