@@ -111,6 +111,7 @@ public class MainActivity extends ActionBarActivity{
         webView.loadUrl(url);
         editText.clearFocus();
 
+
         sButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 textView.setText(editText.getText());
@@ -169,12 +170,6 @@ public class MainActivity extends ActionBarActivity{
                 snames[i] = e.ownText();
                 i++;
             }
-            /*for (int a = 0; a < 40; a++) {
-                shouts[a] = snames[a] + ": " + smgs[a];
-            }*/
-
-
-
 
         ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
             HashMap<String,String> item;
@@ -185,7 +180,6 @@ public class MainActivity extends ActionBarActivity{
                 list.add(item);
             }
 
-            MyService service = new MyService();
             simpleAdapter = new SimpleAdapter(context,list,R.layout.simplerow,
                     new String[]{"line1","line2"},
                     new int[]{R.id.line_a,R.id.line_b});
@@ -198,19 +192,8 @@ public class MainActivity extends ActionBarActivity{
 
             listView.setAdapter(simpleAdapter);
 
-
-            /*ArrayList<String> fShouts = new ArrayList<String>();
-            fShouts.addAll(Arrays.asList(shouts));
-            listAdapter = new ArrayAdapter<String>(context, R.layout.simplerow, fShouts);
-            listView.setAdapter(listAdapter);*/
-            //textView.setText(shouts[0]);
-
             handler.postDelayed(scrape,5000);
         }
     };
 
-}
-
-class MyService extends ListActivity{
-    //lel
 }
