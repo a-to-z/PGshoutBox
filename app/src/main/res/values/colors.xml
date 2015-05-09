@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="cyan" type="color">#00393E</item>
+    <item name="cyanD" type="color">#003135</item>
+    <item name="txtColor" type="color">#EAEAEC</item>
+    <item name="names" type="color">#F37735</item>
+
+</resources>

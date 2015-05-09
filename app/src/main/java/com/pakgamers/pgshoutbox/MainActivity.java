@@ -3,8 +3,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Text;
 
+import android.app.ListActivity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,16 +20,19 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import android.webkit.CookieManager;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import android.os.Handler;
 import java.lang.Runnable;
+import java.util.HashMap;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity{
 
     //URL address
     String url = "http://www.pakgamers.com/forums/vbshout.php?do=detach&instanceid=1";
@@ -38,6 +44,20 @@ public class MainActivity extends ActionBarActivity {
     Context context = this;
     EditText editText;
     Button sButton;
+    CookieManager cookieManager;
+    SimpleAdapter simpleAdapter;
+    String[][] StatesAndCapitals =
+            {{"Alabama","Montgomery"},
+                    {"Alaska","Juneau"},
+                    {"Arizona","Phoenix"},
+                    {"Arkansas","Little Rock"},
+                    {"California","Sacramento"},
+                    {"Colorado","Denver"},
+                    {"Connecticut","Hartford"},
+                    {"Delaware","Dover"},
+                    {"Florida","Tallahassee"}};
+
+
 
 
     @Override
@@ -51,8 +71,18 @@ public class MainActivity extends ActionBarActivity {
         set = new WebAppInterface(this);
         editText = (EditText) findViewById(R.id.editText);
         sButton = (Button) findViewById(R.id.button);
+        editText.clearFocus();
 
-        CookieManager.getInstance().setAcceptCookie(true);
+
+
+        cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+
+        if (!cookieManager.hasCookies()){
+
+
+
+        };
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setLoadsImagesAutomatically(false);
@@ -69,16 +99,17 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 //load html
-
+                editText.clearFocus();
                 textView.setText("onPageFinished");
                 handler = new Handler();
-                handler.postDelayed(scrape,5000);
+                handler.postDelayed(scrape, 500);
+
 
             }
         });
 
         webView.loadUrl(url);
-
+        editText.clearFocus();
 
         sButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -138,18 +169,48 @@ public class MainActivity extends ActionBarActivity {
                 snames[i] = e.ownText();
                 i++;
             }
-            for (int a = 0; a < 40; a++) {
+            /*for (int a = 0; a < 40; a++) {
                 shouts[a] = snames[a] + ": " + smgs[a];
+            }*/
+
+
+
+
+        ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
+            HashMap<String,String> item;
+            for(int b=0;b<40;b++){
+                item = new HashMap<String,String>();
+                item.put("line1",snames[b]+":");
+                item.put("line2",smgs[b]);
+                list.add(item);
             }
 
-            ArrayList<String> fShouts = new ArrayList<String>();
+            MyService service = new MyService();
+            simpleAdapter = new SimpleAdapter(context,list,R.layout.simplerow,
+                    new String[]{"line1","line2"},
+                    new int[]{R.id.line_a,R.id.line_b});
+            /*TextView t1 = (TextView) findViewById(R.id.line_a);
+            TextView t2 = (TextView) findViewById(R.id.line_b);
+            Typeface raleBold = Typeface.createFromAsset(getAssets(),"Raleway-SemiBold.ttf");
+            Typeface raleReg = Typeface.createFromAsset(getAssets(),"Raleway-Regular.ttf");
+            t1.setTypeface(raleBold);
+            t2.setTypeface(raleReg);*/
+
+            listView.setAdapter(simpleAdapter);
+
+
+            /*ArrayList<String> fShouts = new ArrayList<String>();
             fShouts.addAll(Arrays.asList(shouts));
             listAdapter = new ArrayAdapter<String>(context, R.layout.simplerow, fShouts);
-            listView.setAdapter(listAdapter);
+            listView.setAdapter(listAdapter);*/
             //textView.setText(shouts[0]);
-
 
             handler.postDelayed(scrape,5000);
         }
     };
+
+}
+
+class MyService extends ListActivity{
+    //lel
 }

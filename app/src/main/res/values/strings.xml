@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">PG shoutBox</string>
+    <string name="app_name">PakGamers shoutBox</string>
 
     <string name="action_settings">Settings</string>
     <string name="html"></string>
+    <string name="title_activity_splash">Splash</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
