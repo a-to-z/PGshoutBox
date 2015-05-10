@@ -10,8 +10,10 @@
         <item name="android:textColorSecondary">@color/txtColor</item>
     </style>
 
-    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/cyan</item>
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="background">@color/cyan</item>
+        <item name="logo">@drawable/thelogo</item>
+        <item name="displayOptions">useLogo|showTitle</item>
     </style>
 
 </resources>
