@@ -3,21 +3,17 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.w3c.dom.Text;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -31,9 +27,7 @@ import android.widget.TextView;
 
 import android.webkit.CookieManager;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import android.os.Handler;
 import java.lang.Runnable;
 import java.util.HashMap;
@@ -55,6 +49,10 @@ public class MainActivity extends ActionBarActivity{
     ListView listView;
     String[] smgs = new String[40];
     String[] snames = new String[40];
+    ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
+    HashMap<String,String> items;
+    Boolean loadFinish=false;
+    Boolean loggedin;
 
 
     @Override
@@ -84,6 +82,17 @@ public class MainActivity extends ActionBarActivity{
         webView.addJavascriptInterface(set, "parse");
 
 
+        listView = (ListView) findViewById(R.id.listView);
+        simpleAdapter = new SimpleAdapter(
+                context,
+                list,
+                R.layout.simplerow,
+                new String[]{"line1", "line2"},
+                new int[]{R.id.line_a, R.id.line_b});
+
+
+        listView.setAdapter(simpleAdapter);
+
 
         webView.setWebViewClient(new WebViewClient() {
 
@@ -91,33 +100,31 @@ public class MainActivity extends ActionBarActivity{
             public void onPageFinished(WebView view, String url) {
                 //load html
 
-                String loggedin = "";
+                //String loggedin = "";
+                loadFinish = true;
+                loggedin = false;
                 String cookies = cookieManager.getCookie("http://www.pakgamers.com");
-                String temp[]=cookies.split(";");
-                for (String ar1:temp){
-                    if(ar1.contains("vbseo_loggedin=yes")){
-                        loggedin = ar1;
+                String temp[] = cookies.split(";");
+                for (String ar1 : temp) {
+                    if (ar1.contains("vbseo_loggedin=yes")) {
+                        loggedin = true;
                     }
+
                 }
+                invalidateOptionsMenu();
 
 
-                if (loggedin==""){
+                /*if (loggedin==""){
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(context);
                     LinearLayout layout = new LinearLayout(context);
                     layout.setOrientation(LinearLayout.VERTICAL);
-        //            ViewGroup.LayoutParams layoutParams = layout.getLayoutParams();
-         //           layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
 
                     alert.setTitle("Login");
                     alert.setMessage("Enter Username and Password");
 
                     final EditText user = new EditText(context);
                     final EditText pass = new EditText(context);
-        //            ViewGroup.LayoutParams userP = user.getLayoutParams();
-          //          ViewGroup.LayoutParams passP = pass.getLayoutParams();
-            //        userP.width = ViewGroup.LayoutParams.MATCH_PARENT;
-              //      passP.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     user.setTextColor(Color.BLACK);
                     pass.setTextColor(Color.BLACK);
                     user.setHint("Username");
@@ -147,7 +154,7 @@ public class MainActivity extends ActionBarActivity{
 
                     alert.show();
 
-                };
+                };*/
                 editText.clearFocus();
                 textView.setText("onPageFinished");
                 handler = new Handler();
@@ -160,7 +167,6 @@ public class MainActivity extends ActionBarActivity{
 
         webView.loadUrl(url);
         editText.clearFocus();
-
 
         sButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -178,6 +184,17 @@ public class MainActivity extends ActionBarActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+            if(loadFinish==true) {
+                if (loggedin == true) {
+                    menu.findItem(R.id.login).setVisible(false);
+                    menu.findItem(R.id.signout).setVisible(true);
+                } else {
+                    menu.findItem(R.id.login).setVisible(true);
+                    menu.findItem(R.id.signout).setVisible(false);
+                }
+            }
+
         return true;
     }
 
@@ -189,75 +206,68 @@ public class MainActivity extends ActionBarActivity{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        switch (item.getItemId()) {
 
-        return super.onOptionsItemSelected(item);
+            case R.id.login:
+                Intent i = new Intent(MainActivity.this,LoginActivity.class);
+                startActivityForResult(i, 33101);
+
+
+            case R.id.signout:
+                cookieManager.removeAllCookie();
+                webView.clearCache(true);
+                webView.loadUrl(url);
+                loggedin = false;
+                invalidateOptionsMenu();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bundle extras = data.getExtras();
+
+        switch(requestCode) {
+            case (33101) : {
+                if (resultCode == LoginActivity.RESULT_OK) {
+                    String loginJS = "javascript:window.document.getElementById('navbar_username').value = '"+extras.getString("username")+"';" +
+                            "window.document.getElementById('navbar_password').value = '"+extras.getString("password")+"';" +
+                            "window.document.getElementById('cb_cookieuser_navbar').checked = true;" +
+                            "window.document.getElementsByClassName('login')[0].click();";
+                    webView.loadUrl(loginJS);
+
+                }
+                break;
+            }
+        }
     }
 
     Runnable scrape = new Runnable() {
         @Override
         public void run() {
-
             webView.loadUrl("javascript:window.HtmlViewer.showHTML(document.getElementsByName('dbtech_vbshout_content')[0].innerHTML);");
 
-
-        /*    Document doc = Jsoup.parse(jInterface.html);
-            Elements msg = doc.select("span[name=dbtech_vbshout_shout][style]");
-            Elements names = doc.select("a.popupctrl > font");
-
-
-            int i = 0;
-            for (Element e : msg) {
-                smgs[i] = e.ownText();
-                i++;
-            }
-            i = 0;
-            for (Element e : names) {
-                snames[i] = e.ownText();
-                i++;
-            }
-
-        ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
-            HashMap<String,String> item;
-            for(int b=0;b<40;b++){
-                item = new HashMap<String,String>();
-                item.put("line1",snames[b]+":");
-                item.put("line2",smgs[b]);
-                list.add(item);
-            }
-
-            simpleAdapter = new SimpleAdapter(context,list,R.layout.simplerow,
-                    new String[]{"line1","line2"},
-                    new int[]{R.id.line_a,R.id.line_b});*/
-            /*TextView t1 = (TextView) findViewById(R.id.line_a);
-            TextView t2 = (TextView) findViewById(R.id.line_b);
-            Typeface raleBold = Typeface.createFromAsset(getAssets(),"Raleway-SemiBold.ttf");
-            Typeface raleReg = Typeface.createFromAsset(getAssets(),"Raleway-Regular.ttf");
-            t1.setTypeface(raleBold);
-            t2.setTypeface(raleReg);*/
-
-        //    listView.setAdapter(simpleAdapter);
-            handler.postDelayed(populateList, 2000);
-            handler.postDelayed(scrape, 3000);
+            handler.postDelayed(populateList, 500);
+            handler.postDelayed(scrape, 500);
         }
     };
 
     Runnable unIdle = new Runnable() {
         @Override
         public void run() {
-            webView.loadUrl("javascript:window.parse.showHTML(document.getElementById('dbtech_vbshout_editor1').value = '/unban nanow');");
+            webView.loadUrl("javascript:window.parse.showHTML(document.getElementById('dbtech_vbshout_editor1').value = '/unban ammarzubair');");
             webView.loadUrl("javascript:window.document.getElementsByName('dbtech_vbshout_savebutton')[0].click();");
 
-            handler.postDelayed(unIdle,120000);
+            handler.postDelayed(unIdle,100000);
         }
     };
 
     Runnable populateList = new Runnable() {
         @Override
         public void run() {
-            listView = (ListView) findViewById(R.id.listView);
             Document doc = Jsoup.parse(jInterface.html);
             Elements msg = doc.select("span[name=dbtech_vbshout_shout][style]");
             Elements names = doc.select("a.popupctrl > font");
@@ -272,26 +282,14 @@ public class MainActivity extends ActionBarActivity{
                 i++;
             }
 
-            ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
-            HashMap<String,String> item;
+            list.clear();
             for(int b=0;b<40;b++){
-                item = new HashMap<String,String>();
-                item.put("line1",snames[b]+":");
-                item.put("line2",smgs[b]);
-                list.add(item);
+                items = new HashMap<String,String>();
+                items.put("line1",snames[b]+":");
+                items.put("line2",smgs[b]);
+                list.add(items);
             }
-
-            simpleAdapter = new SimpleAdapter(context,list,R.layout.simplerow,
-                    new String[]{"line1","line2"},
-                    new int[]{R.id.line_a,R.id.line_b});
-            /*TextView t1 = (TextView) findViewById(R.id.line_a);
-            TextView t2 = (TextView) findViewById(R.id.line_b);
-            Typeface raleBold = Typeface.createFromAsset(getAssets(),"Raleway-SemiBold.ttf");
-            Typeface raleReg = Typeface.createFromAsset(getAssets(),"Raleway-Regular.ttf");
-            t1.setTypeface(raleBold);
-            t2.setTypeface(raleReg);*/
-
-            listView.setAdapter(simpleAdapter);
+            simpleAdapter.notifyDataSetChanged();
         }
     };
 

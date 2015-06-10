@@ -5,4 +5,9 @@
     <string name="html"></string>
     <string name="title_activity_splash">Splash</string>
     <string name="launcher_name">PG shoutBox</string>
+    <string name="title_activity_login">Sign In</string>
+    <string name="login">Log In</string>
+    <string name="signout">Sign Out</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
