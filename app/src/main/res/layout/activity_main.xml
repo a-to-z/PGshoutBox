@@ -23,7 +23,6 @@
         android:id="@+id/webView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/editText"
         android:layout_below="@+id/textView"
         android:visibility="invisible"/>
 
@@ -55,13 +54,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
-        android:layout_alignTop="@+id/textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/editText"
         tools:listitem="@layout/simplerow"
         android:isScrollContainer="true"
         android:visibility="visible"
-        android:dividerHeight="7dp" />
+        android:dividerHeight="7dp"
+        android:layout_above="@+id/editText" />
 
 </RelativeLayout>

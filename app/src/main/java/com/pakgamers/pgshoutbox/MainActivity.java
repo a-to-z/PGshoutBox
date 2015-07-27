@@ -75,7 +75,7 @@ public class MainActivity extends ActionBarActivity{
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setLoadsImagesAutomatically(false);
-        webView.getSettings().setUserAgentString("Chrome/42.0.2311.135");
+        webView.getSettings().setUserAgentString("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.93 Safari/537.36");
         webView.setVisibility(View.INVISIBLE);
 
         webView.addJavascriptInterface(jInterface, "HtmlViewer");
@@ -100,7 +100,6 @@ public class MainActivity extends ActionBarActivity{
             public void onPageFinished(WebView view, String url) {
                 //load html
 
-                //String loggedin = "";
                 loadFinish = true;
                 loggedin = false;
                 String cookies = cookieManager.getCookie("http://www.pakgamers.com");
@@ -113,48 +112,6 @@ public class MainActivity extends ActionBarActivity{
                 }
                 invalidateOptionsMenu();
 
-
-                /*if (loggedin==""){
-
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                    LinearLayout layout = new LinearLayout(context);
-                    layout.setOrientation(LinearLayout.VERTICAL);
-
-                    alert.setTitle("Login");
-                    alert.setMessage("Enter Username and Password");
-
-                    final EditText user = new EditText(context);
-                    final EditText pass = new EditText(context);
-                    user.setTextColor(Color.BLACK);
-                    pass.setTextColor(Color.BLACK);
-                    user.setHint("Username");
-                    pass.setHint("Password");
-                    layout.addView(user);
-                    layout.addView(pass);
-
-                    alert.setView(layout);
-
-                    alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String loginJS = "javascript:window.document.getElementById('navbar_username').value = '"+user.getText()+"';" +
-                                    "window.document.getElementById('navbar_password').value = '"+pass.getText()+"';" +
-                                    "window.document.getElementById('cb_cookieuser_navbar').checked = true;" +
-                                    "window.document.getElementsByClassName('login')[0].click();";
-                            webView.loadUrl(loginJS);
-                        }
-                    });
-
-                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
-
-                    alert.show();
-
-                };*/
                 editText.clearFocus();
                 textView.setText("onPageFinished");
                 handler = new Handler();

@@ -11,8 +11,8 @@
         android:adjustViewBounds="false"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/imageView"
-        android:src="@drawable/splash"
+            android:id="@+id/imageView"
+            android:src="@drawable/splash"
         android:cropToPadding="false"
         android:scaleType="centerInside"
         android:layout_gravity="center|bottom" />
