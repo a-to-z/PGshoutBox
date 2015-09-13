@@ -11,6 +11,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,7 +92,6 @@ public class MainActivity extends ActionBarActivity{
                 R.layout.simplerow,
                 new String[]{"line1", "line2"},
                 new int[]{R.id.line_a, R.id.line_b});
-
 
         listView.setAdapter(simpleAdapter);
 
@@ -231,6 +233,16 @@ public class MainActivity extends ActionBarActivity{
             int i = 0;
             for (Element e : msg) {
                 smgs[i] = e.ownText();
+                String temp = "";
+                temp = e.select("a").attr("href");
+                if(temp != ""){
+                    smgs[i] += " " + temp;
+                }
+
+                Elements emo = e.select("img");
+                for (Element f : emo){
+                    smgs[i] += " :" + f.attr("title") + ":";
+                }
                 i++;
             }
             i = 0;
