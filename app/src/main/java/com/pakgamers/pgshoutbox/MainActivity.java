@@ -247,7 +247,7 @@ public class MainActivity extends ActionBarActivity{
             }
             i = 0;
             for (Element e : names) {
-                snames[i] = e.ownText();
+                snames[i] = e.text();
                 i++;
             }
 
