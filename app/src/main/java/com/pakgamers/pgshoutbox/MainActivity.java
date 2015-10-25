@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,7 @@ public class MainActivity extends ActionBarActivity{
     ListView listView;
     String[] smgs = new String[40];
     String[] snames = new String[40];
+    String[] stime = new String[40];
     ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
     HashMap<String,String> items;
     Boolean loadFinish=false;
@@ -90,8 +92,8 @@ public class MainActivity extends ActionBarActivity{
                 context,
                 list,
                 R.layout.simplerow,
-                new String[]{"line1", "line2"},
-                new int[]{R.id.line_a, R.id.line_b});
+                new String[]{"line1", "line2", "line3"},
+                new int[]{R.id.line_a, R.id.line_c, R.id.line_b});
 
         listView.setAdapter(simpleAdapter);
 
@@ -179,6 +181,17 @@ public class MainActivity extends ActionBarActivity{
                 loggedin = false;
                 invalidateOptionsMenu();
 
+            /*case R.id.about:
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(" Version 1.2 \n App was created by Cyanogen Labs \n www.cyanogenlabs.com \n ");
+                builder.setTitle("About");
+                AlertDialog dialog = builder.create();
+                TextView messageText = (TextView) dialog.findViewById(android.R.id.message);
+                messageText.setGravity(Gravity.CENTER);
+                dialog.show();
+                messageText.setMovementMethod(LinkMovementMethod.getInstance());*/
+
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -229,19 +242,34 @@ public class MainActivity extends ActionBarActivity{
         public void run() {
             Document doc = Jsoup.parse(jInterface.html);
             Elements msg = doc.select("span[name=dbtech_vbshout_shout][style]");
+            Elements time = doc.select("span[name=dbtech_vbshout_shout]");
+            /*int i =0;
+            for(int s=0;s<80;s+=2){
+                stime[i] = time.
+                i++;
+            }*/
             Elements names = doc.select("a.popupctrl > font");
             int i = 0;
-            for (Element e : msg) {
-                smgs[i] = e.ownText();
-                String temp = "";
-                temp = e.select("a").attr("href");
-                if(temp != ""){
-                    smgs[i] += " " + temp;
+            int j=0;
+            int k=0;
+            for (Element e : time) {
+                if(i%2==0){
+                    stime[j] = e.ownText();
+                    j++;
                 }
+                if(i%2==1) {
+                    smgs[k] = e.ownText();
+                    String temp = "";
+                    temp = e.select("a").attr("href");
+                    if (temp != "") {
+                        smgs[k] += " " + temp;
+                    }
 
-                Elements emo = e.select("img");
-                for (Element f : emo){
-                    smgs[i] += " :" + f.attr("title") + ":";
+                    Elements emo = e.select("img");
+                    for (Element f : emo) {
+                        smgs[k] += " :" + f.attr("title") + ":";
+                    }
+                    k++;
                 }
                 i++;
             }
@@ -255,7 +283,8 @@ public class MainActivity extends ActionBarActivity{
             for(int b=0;b<40;b++){
                 items = new HashMap<String,String>();
                 items.put("line1",snames[b]+":");
-                items.put("line2",smgs[b]);
+                items.put("line2",stime[b]);
+                items.put("line3", smgs[b]);
                 list.add(items);
             }
             simpleAdapter.notifyDataSetChanged();

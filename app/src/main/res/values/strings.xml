@@ -8,6 +8,6 @@
     <string name="title_activity_login">Sign In</string>
     <string name="login">Log In</string>
     <string name="signout">Sign Out</string>
-
+    <string name="about">About</string>
     <string name="hello_world">Hello world!</string>
 </resources>
